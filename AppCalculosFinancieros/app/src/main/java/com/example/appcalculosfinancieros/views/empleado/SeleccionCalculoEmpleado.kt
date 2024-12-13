@@ -29,7 +29,7 @@ fun SeleccionCalculoEmpleado(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Selección de Cálculos - Empleado", color = Color.White) },
+                title = { Text("Selección de Cálculos - Empleados", color = Color.White) },
                 colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF003366))
             )
         },
@@ -51,16 +51,17 @@ fun SeleccionCalculoEmpleado(
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Resultados del cálculo
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp) // Espacio aumentado para resultados
+                    .height(240.dp)
                     .background(Color(0xFFEEECEC))
                     .padding(8.dp)
             ) {
                 Column {
                     Text("Resultados del Cálculo", fontSize = 16.sp, color = Color.Black)
-                    Text("Segmento: Empleado", fontSize = 14.sp, color = Color.Gray)
+                    Text("Segmento: Empleados", fontSize = 14.sp, color = Color.Gray)
                     entradas.forEach { (clave, valor) ->
                         Text("$clave: $valor", fontSize = 14.sp, color = Color.Gray)
                     }
@@ -71,6 +72,7 @@ fun SeleccionCalculoEmpleado(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Botones de cálculo
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 item {
                     CustomButton(
@@ -78,7 +80,7 @@ fun SeleccionCalculoEmpleado(
                         onClick = {
                             viewModel.calcularSalarioNeto()
                             historialViewModel.agregarCalculo(
-                                viewModel.crearHistorial("Calcular Salario Neto", "Empleado")
+                                viewModel.crearHistorial("Calcular Salario Neto", "Empleados")
                             )
                         },
                         modifier = Modifier.height(90.dp)
@@ -86,11 +88,11 @@ fun SeleccionCalculoEmpleado(
                 }
                 item {
                     CustomButton(
-                        text = "Calcular Hora Extra Diurna",
+                        text = "Calcular Deducciones",
                         onClick = {
-                            viewModel.calcularHoraExtraDiurna()
+                            viewModel.calcularDeduccionesNomina()
                             historialViewModel.agregarCalculo(
-                                viewModel.crearHistorial("Calcular Hora Extra Diurna", "Empleado")
+                                viewModel.crearHistorial("Calcular Deducciones", "Empleados")
                             )
                         },
                         modifier = Modifier.height(90.dp)
@@ -98,11 +100,11 @@ fun SeleccionCalculoEmpleado(
                 }
                 item {
                     CustomButton(
-                        text = "Calcular Hora Extra Nocturna",
+                        text = "Calcular Horas Extras",
                         onClick = {
-                            viewModel.calcularHoraExtraNocturna()
+                            viewModel.calcularHorasExtras()
                             historialViewModel.agregarCalculo(
-                                viewModel.crearHistorial("Calcular Hora Extra Nocturna", "Empleado")
+                                viewModel.crearHistorial("Calcular Horas Extras", "Empleados")
                             )
                         },
                         modifier = Modifier.height(90.dp)
@@ -110,11 +112,11 @@ fun SeleccionCalculoEmpleado(
                 }
                 item {
                     CustomButton(
-                        text = "Calcular Hora Dominical/Festiva",
+                        text = "Calcular Bonificaciones",
                         onClick = {
-                            viewModel.calcularHoraDominicalFestiva()
+                            viewModel.calcularBonificaciones()
                             historialViewModel.agregarCalculo(
-                                viewModel.crearHistorial("Calcular Hora Dominical/Festiva", "Empleado")
+                                viewModel.crearHistorial("Calcular Bonificaciones", "Empleados")
                             )
                         },
                         modifier = Modifier.height(90.dp)

@@ -19,27 +19,26 @@ fun CapturaDatosEmpleado(
     navController: NavController,
     viewModel: CalculosEmpleadoViewModel
 ) {
-    // Variables para los campos de entrada
+    // Variables de estado para los campos de entrada
     var salarioBase by remember { mutableStateOf("") }
-    var horasExtras by remember { mutableStateOf("") }
-    var bonificaciones by remember { mutableStateOf("") }
     var deducciones by remember { mutableStateOf("") }
+    var horasDiurnas by remember { mutableStateOf("") }
+    var horasNocturnas by remember { mutableStateOf("") }
+    var horasFestivas by remember { mutableStateOf("") }
+    var porcentajeBonificacion by remember { mutableStateOf("") }
     var mostrarAlerta by remember { mutableStateOf(false) }
 
-    val camposLlenos = salarioBase.isNotBlank() &&
-            horasExtras.isNotBlank() &&
-            bonificaciones.isNotBlank() &&
-            deducciones.isNotBlank()
+    // Validación de campos esenciales
+    val camposValidos = salarioBase.isNotBlank()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Cálculos de Datos - Empleado", color = Color.White) },
+                title = { Text("Cálculos de Datos - Empleados", color = Color.White) },
                 colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF003366))
             )
         },
         bottomBar = {
-            // Botón de Volver agregado aquí
             CustomButton(
                 text = "Volver",
                 onClick = { navController.popBackStack() },
@@ -48,49 +47,50 @@ fun CapturaDatosEmpleado(
                     .padding(16.dp)
                     .height(48.dp)
             )
-        },
-        containerColor = Color(0xFFF5F5F5)
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.Top
         ) {
             // Campos de entrada
             CampoEntrada("Salario Base", salarioBase) { salarioBase = it }
-            CampoEntrada("Horas Extras", horasExtras) { horasExtras = it }
-            CampoEntrada("Bonificaciones", bonificaciones) { bonificaciones = it }
             CampoEntrada("Deducciones", deducciones) { deducciones = it }
+            CampoEntrada("Horas Extra Diurnas", horasDiurnas) { horasDiurnas = it }
+            CampoEntrada("Horas Extra Nocturnas", horasNocturnas) { horasNocturnas = it }
+            CampoEntrada("Horas Festivas/Dominicales", horasFestivas) { horasFestivas = it }
+            CampoEntrada("% de Salario para Bonificación", porcentajeBonificacion) { porcentajeBonificacion = it }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón Calcular
+            // Botón Continuar
             CustomButton(
                 text = "Calcular",
                 onClick = {
-                    if (camposLlenos) {
-                        val entradas = mapOf(
-                            "salarioBase" to salarioBase,
-                            "horasExtras" to horasExtras,
-                            "bonificaciones" to bonificaciones,
-                            "deducciones" to deducciones
-                        )
-                        viewModel.actualizarEntradas(entradas)
-                        navController.navigate("seleccion_calculo_empleado")
-                    } else {
-                        mostrarAlerta = true
-                    }
-                },
-                modifier = Modifier
+                    val entradas = mapOf(
+                        "salarioBase" to salarioBase,
+                        "deducciones" to deducciones,
+                        "horasDiurnas" to horasDiurnas,
+                        "horasNocturnas" to horasNocturnas,
+                        "horasFestivas" to horasFestivas,
+                        "porcentajeBonificacion" to porcentajeBonificacion
+                    )
+                    viewModel.actualizarEntradas(entradas)
+                    navController.navigate("seleccion_calculo_empleado")
+                }, modifier = Modifier
                     .fillMaxWidth()
                     .height(90.dp),
-                enabled = camposLlenos
+                enabled = camposValidos
             )
 
+            // Mostrar alerta si los campos no son válidos
             if (mostrarAlerta) {
-                MostrarAlerta("Por favor, completa todos los campos.") { mostrarAlerta = false }
+                MostrarAlerta("Por favor, completa al menos el campo Salario Base.") {
+                    mostrarAlerta = false
+                }
             }
         }
     }
@@ -100,7 +100,7 @@ fun CapturaDatosEmpleado(
 fun CampoEntrada(label: String, value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
-        onValueChange = { if (it.all { char -> char.isDigit() }) onValueChange(it) },
+        onValueChange = { if (it.all { char -> char.isDigit() || char == '.' }) onValueChange(it) },
         label = { Text(label, fontSize = 14.sp) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
@@ -115,7 +115,9 @@ fun MostrarAlerta(mensaje: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("OK", color = Color(0xFF003366)) }
+            TextButton(onClick = onDismiss) {
+                Text("OK", color = Color(0xFF003366))
+            }
         },
         title = { Text("Error") },
         text = { Text(mensaje) }
